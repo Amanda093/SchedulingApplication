@@ -9,12 +9,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -62,6 +65,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun App(){
     // select
+    var mostrarLista by remember { mutableStateOf(false) }
     val usuarios = remember { mutableStateListOf<Usuario>() }
     val usuariosRef = db.collection("users")
 
@@ -109,8 +113,6 @@ fun App(){
         "city" to city,
         "state" to state
     )
-
-
 
     // aparencia da página
     Column(Modifier.fillMaxSize()) {
@@ -195,19 +197,54 @@ fun App(){
                         )
                     }
                 }
-                LazyColumn {
-                    items(usuarios) {
-                        Row() {
-                            Text(text = it.name)
-                            Text(text = it.adress)
-                            Text(text = it.neighborhood)
-                            Text(text = it.CEP)
-                            Text(text = it.city)
-                            Text(text = it.state)
+                Row {
+                    Button(onClick = {
+                        usuariosRef.get()
+                            .addOnSuccessListener { snapshots ->
+                                usuarios.clear()
+                                for (document in snapshots) {
+                                    val usuario = Usuario().apply {
+                                        name = document.getString("name") ?: ""
+                                        adress = document.getString("adress") ?: ""
+                                        neighborhood = document.getString("neighborhood") ?: ""
+                                        CEP = document.getString("CEP") ?: ""
+                                        city = document.getString("city") ?: ""
+                                        state = document.getString("state") ?: ""
+                                    }
+                                    usuarios.add(usuario)
+                                }
+                                mostrarLista = true
+                                Log.d(TAG, "Usuários carregados: ${usuarios.size}")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.w(TAG, "Erro ao carregar usuários", e)
+                            }
+                    }) {
+                        Text("Listar", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+            Row {
+                if (mostrarLista) {
+                    LazyColumn {
+                        items(usuarios) {
+                            Column(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)) {
+                                Text("Nome: ${it.name}")
+                                Text("Endereço: ${it.adress}")
+                                Text("Bairro: ${it.neighborhood}")
+                                Text("CEP: ${it.CEP}")
+                                Text("Cidade: ${it.city}")
+                                Text("Estado: ${it.state}")
+                                Divider(modifier = Modifier.padding(vertical = 8.dp))
+                            }
                         }
                     }
                 }
             }
+
+
         }
     }
 }
