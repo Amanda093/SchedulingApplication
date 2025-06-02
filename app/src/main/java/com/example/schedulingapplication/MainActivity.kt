@@ -49,6 +49,7 @@ val db = Firebase.firestore
 
 @Composable
 fun App(){
+    // conteúdo do banco de dados
     var name by remember{ mutableStateOf("") }
     var adress by remember{ mutableStateOf("") }
     var neighborhood by remember{ mutableStateOf("") }
@@ -64,6 +65,8 @@ fun App(){
         "city" to city,
         "state" to state
     )
+
+    // aparencia da página
     Column(Modifier.fillMaxSize()) {
         Row( modifier = Modifier.fillMaxWidth().padding(0.dp, 24.dp),
             Arrangement.Center,
@@ -125,23 +128,45 @@ fun App(){
             Arrangement.Center
         ){
             Column( Modifier.fillMaxWidth(0.35f)) {
-                Button(
-                    onClick = {
-                        // Add a new document with a generated ID
-                        db.collection("users")
-                            .add(user)
-                            .addOnSuccessListener { documentReference ->
-                                Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
-                            }
-                            .addOnFailureListener { e ->
-                                Log.w(TAG, "Error adding document", e)
-                            } },
-                ) {
-                    Text(
-                        text = "Salvar",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                Row( modifier = Modifier.padding(10.dp, 0.dp)) {
+                    Button(
+                        onClick = {
+                            // Add a new document with a generated ID
+                            db.collection("users")
+                                .add(user)
+                                .addOnSuccessListener { documentReference ->
+                                    Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.w(TAG, "Error adding document", e)
+                                } },
+                    ) {
+                        Text(
+                            text = "Salvar",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            // select do banco de dados
+                            db.collection("user")
+                                .get()
+                                .addOnSuccessListener { result ->
+                                    for (document in result) {
+                                        Log.d(TAG, "${document.id} => ${document.data}")
+                                    }
+                                }
+                                .addOnFailureListener { exception ->
+                                    Log.d(TAG, "Error getting documents: ", exception)
+                                } },
+                    ) {
+                        Text(
+                            text = "Listar",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
