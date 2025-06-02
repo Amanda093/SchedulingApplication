@@ -165,19 +165,25 @@ fun App(){
             Arrangement.Center
         ){
             OutlinedTextField(
+                value = city,
+                onValueChange = { city = it },
+                label = { Text("Cidade") }
+            )
+        }
+        Row( modifier = Modifier.fillMaxWidth(),
+            Arrangement.Center
+        ){
+            OutlinedTextField(
                 value = state,
                 onValueChange = { state = it },
                 label = { Text("Estado") }
             )
         }
 
-        Row( modifier = Modifier.fillMaxWidth()
-            .padding(0.dp, 18.dp),
-            Arrangement.Center
+        Column( modifier = Modifier.fillMaxWidth().padding(68.dp, 24.dp)
         ){
-            Column( Modifier.fillMaxWidth(0.35f),
+                Row( modifier = Modifier.fillMaxWidth(),
                     Arrangement.Center) {
-                Row {
                     Button(
                         onClick = {
                             // Add a new document with a generated ID
@@ -196,8 +202,6 @@ fun App(){
                             fontWeight = FontWeight.Bold
                         )
                     }
-                }
-                Row {
                     Button(onClick = {
                         usuariosRef.get()
                             .addOnSuccessListener { snapshots ->
@@ -223,9 +227,9 @@ fun App(){
                         Text("Listar", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
                 }
-            }
-            Row {
-                if (mostrarLista) {
+
+
+            if (mostrarLista) {
                     LazyColumn {
                         items(usuarios) {
                             Column(modifier = Modifier
@@ -241,10 +245,7 @@ fun App(){
                             }
                         }
                     }
-                }
             }
-
-
         }
     }
 }
